@@ -4,10 +4,10 @@ namespace availability_classmetrics;
 
 defined("MOODLE_INTERNAL") || die();
 
-use core_availability\condition;
+use core_availability\condition as core_condition;
 use core_availability\info;
 
-class condition extends \core_availability\condition {
+class condition extends core_condition {
 
     protected $type;
     protected $percentage;

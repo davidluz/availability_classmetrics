@@ -261,7 +261,7 @@ M.availability_classmetrics.form = Y.Object(M.core_availability.plugin, {
                 errors.push('availability_classmetrics:error_percentage');
             }
             if (!value.activities || value.activities === '') {
-                errors.push('Selecione pelo menos uma atividade');
+                errors.push('availability_classmetrics:error_activities');
             }
         } else if (value.conditiontype === 'students') {
             if (value.minimum === undefined || value.minimum < 1) {
