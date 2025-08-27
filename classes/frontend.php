@@ -4,9 +4,9 @@ namespace availability_classmetrics;
 
 defined("MOODLE_INTERNAL") || die();
 
-use core_availability\frontend;
+use core_availability\frontend as core_frontend;
 
-class frontend extends \core_availability\frontend {
+class frontend extends core_frontend {
 
     protected function get_javascript_strings() {
         return [
@@ -31,13 +31,14 @@ class frontend extends \core_availability\frontend {
         // Get course activities with completion enabled
         $activities = [];
         $coursemodules = $DB->get_records("course_modules", ["course" => $course->id]);
+        $modinfo = get_fast_modinfo($course);
         foreach ($coursemodules as $cm) {
-            $modinfo = get_module_info($cm->id);
-            if ($modinfo && $modinfo->completion != COMPLETION_DISABLED) {
+            $cminfo = $modinfo->get_cm($cm->id);
+            if ($cminfo && $cminfo->completion != COMPLETION_DISABLED) {
                 $activities[] = [
                     'id' => $cm->id,
-                    'name' => $modinfo->name,
-                    'modname' => $modinfo->modname
+                    'name' => $cminfo->name,
+                    'modname' => $cminfo->modname
                 ];
             }
         }
@@ -52,9 +53,10 @@ class frontend extends \core_availability\frontend {
             ];
         }
         
+        // Return data as a numeric array to match JavaScript expectations.
         return [
-            'activities' => $activities,
-            'groups' => $groups
+            $activities,
+            $groups
         ];
     }
 
