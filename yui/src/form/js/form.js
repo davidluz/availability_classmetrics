@@ -229,13 +229,19 @@ M.availability_classmetrics.form = Y.Object(M.core_availability.plugin, {
         
         // Add event handlers
         var self = this;
+        var updateForm = function() {
+            if (M.core_availability && M.core_availability.form) {
+                M.core_availability.form.update();
+            }
+        };
+
         node.one('select[name=conditiontype]').on('change', function() {
             self.updateVisibility();
-            M.core_availability.form.update();
+            updateForm();
         });
-        
+
         node.all('input, select').on('change', function() {
-            M.core_availability.form.update();
+            updateForm();
         });
         
         // Set initial visibility

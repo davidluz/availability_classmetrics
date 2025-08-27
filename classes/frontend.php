@@ -53,9 +53,10 @@ class frontend extends core_frontend {
             ];
         }
         
+        // Return data as a numeric array to match JavaScript expectations.
         return [
-            'activities' => $activities,
-            'groups' => $groups
+            $activities,
+            $groups
         ];
     }
 
