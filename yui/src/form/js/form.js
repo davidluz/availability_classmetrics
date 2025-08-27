@@ -218,6 +218,7 @@ M.availability_classmetrics.form.getNode = function(json) {
             var group = this.groups[j];
             html += '<option value="' + group.id + '">' + group.name + '</option>';
         }
+
     }
 
     html += '</select>';
@@ -232,6 +233,7 @@ M.availability_classmetrics.form.getNode = function(json) {
     var updateForm = function() {
         if (M.core_availability && M.core_availability.form) {
             M.core_availability.form.update();
+
         }
     };
 
