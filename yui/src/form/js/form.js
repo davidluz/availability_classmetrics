@@ -277,8 +277,3 @@ M.availability_classmetrics.form.getErrors = function(value) {
 
     return errors;
 };
-
-// Register plugin with Moodle core availability form.
-M.core_availability.form.registerPlugin('classmetrics', M.availability_classmetrics.form);
-
-
