@@ -75,11 +75,11 @@ YUI.add('moodle-availability_classmetrics-form', function(Y, NAME) {
         minWrap.append(minin);
         root.append(minWrap);
         // Alternância
-        root.one('input[name=' + ruleName + '][value=percent]').on('change', function() {
+        root.one('input[name="' + ruleName + '"][value=percent]').on('change', function() {
             percentWrap.setStyle('display', '');
             minWrap.setStyle('display', 'none');
         });
-        root.one('input[name=' + ruleName + '][value=minstudents]').on('change', function() {
+         root.one('input[name="' + ruleName + '"][value=minstudents]').on('change', function() {
             percentWrap.setStyle('display', 'none');
             minWrap.setStyle('display', '');
         });
@@ -90,7 +90,8 @@ YUI.add('moodle-availability_classmetrics-form', function(Y, NAME) {
         // Identificador do plugin no JSON salvo.
         value.type = 'classmetrics';
         var ruleName = node.getAttribute('data-rule');
-        var rule = node.one('input[name=' + ruleName + ']:checked').get('value');
+        var ruleInput = node.one('input[name="' + ruleName + '"]:checked');
+        var rule = ruleInput ? ruleInput.get('value') : 'minstudents';
         value.rule = rule;
         // 1º <select> é o de grupo (o de atividades está no bloco percent).
         value.groupid = parseInt(node.one('.form-group select').get('value'), 10) || 0;
@@ -101,7 +102,8 @@ YUI.add('moodle-availability_classmetrics-form', function(Y, NAME) {
             });
             value.activities = acts;
             var aggName = node.getAttribute('data-agg');
-            value.aggregation = node.one('input[name=' + aggName + ']:checked').get('value') === 'any' ? 'any' : 'all';
+             var aggInput = node.one('input[name="' + aggName + '"]:checked');
+            value.aggregation = aggInput && aggInput.get('value') === 'any' ? 'any' : 'all';
             var p = parseInt(node.one('.percentblock input[type=number]').get('value'), 10);
             value.percent = isNaN(p) ? 0 : Math.max(0, Math.min(100, p));
         } else {
@@ -116,7 +118,8 @@ YUI.add('moodle-availability_classmetrics-form', function(Y, NAME) {
 // Substitua a função inteira por esta versão ↓
 M.availability_classmetrics.form.fillErrors = function(errors, node) {
     var ruleName = node.getAttribute('data-rule');
-    var rule = node.one('input[name=' + ruleName + ']:checked').get('value');
+    var ruleInput = node.one('input[name="' + ruleName + '"]:checked');
+    var rule = ruleInput ? ruleInput.get('value') : 'minstudents';
     if (rule === 'percent') {
         var selectedActs = 0;
         node.all('.percentblock select option').each(function(opt){
