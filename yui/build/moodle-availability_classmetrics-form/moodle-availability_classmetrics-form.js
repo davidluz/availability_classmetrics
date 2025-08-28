@@ -75,11 +75,11 @@ YUI.add('moodle-availability_classmetrics-form', function(Y, NAME) {
         minWrap.append(minin);
         root.append(minWrap);
         // Alternância
-        root.one('input[name="' + ruleName + '"][value=percent]').on('change', function() {
+        root.one('input[name=' + ruleName + '][value=percent]').on('change', function() {
             percentWrap.setStyle('display', '');
             minWrap.setStyle('display', 'none');
         });
-         root.one('input[name="' + ruleName + '"][value=minstudents]').on('change', function() {
+        root.one('input[name=' + ruleName + '][value=minstudents]').on('change', function() {
             percentWrap.setStyle('display', 'none');
             minWrap.setStyle('display', '');
         });
@@ -90,8 +90,7 @@ YUI.add('moodle-availability_classmetrics-form', function(Y, NAME) {
         // Identificador do plugin no JSON salvo.
         value.type = 'classmetrics';
         var ruleName = node.getAttribute('data-rule');
-        var ruleInput = node.one('input[name="' + ruleName + '"]:checked');
-        var rule = ruleInput ? ruleInput.get('value') : 'minstudents';
+        var rule = node.one('input[name=' + ruleName + ']:checked').get('value');
         value.rule = rule;
         // 1º <select> é o de grupo (o de atividades está no bloco percent).
         value.groupid = parseInt(node.one('.form-group select').get('value'), 10) || 0;
@@ -102,8 +101,7 @@ YUI.add('moodle-availability_classmetrics-form', function(Y, NAME) {
             });
             value.activities = acts;
             var aggName = node.getAttribute('data-agg');
-             var aggInput = node.one('input[name="' + aggName + '"]:checked');
-            value.aggregation = aggInput && aggInput.get('value') === 'any' ? 'any' : 'all';
+            value.aggregation = node.one('input[name=' + aggName + ']:checked').get('value') === 'any' ? 'any' : 'all';
             var p = parseInt(node.one('.percentblock input[type=number]').get('value'), 10);
             value.percent = isNaN(p) ? 0 : Math.max(0, Math.min(100, p));
         } else {
@@ -114,24 +112,27 @@ YUI.add('moodle-availability_classmetrics-form', function(Y, NAME) {
             value.minstudents = isNaN(m) ? 0 : Math.max(0, m);
         }
     };
-    // Validação no cliente: empurrar **component:id** e nunca itens vazios.
-// Substitua a função inteira por esta versão ↓
-M.availability_classmetrics.form.fillErrors = function(errors, node) {
+    // Client-side validation.
+    M.availability_classmetrics.form.fillErrors = function(errors, node) {
     var ruleName = node.getAttribute('data-rule');
-    var ruleInput = node.one('input[name="' + ruleName + '"]:checked');
-    var rule = ruleInput ? ruleInput.get('value') : 'minstudents';
+    var rule = node.one('input[name=' + ruleName + ']:checked').get('value');
     if (rule === 'percent') {
         var selectedActs = 0;
         node.all('.percentblock select option').each(function(opt){
             if (opt.get('selected')) { selectedActs++; }
         });
-        // Empurra só o identificador da string (sem "availability_classmetrics:")
-         if (selectedActs === 0) { errors.push('availability_classmetrics:error_noactivities'); }
+        if (selectedActs === 0) {
+            errors.push('availability_classmetrics:error_noactivities');
+        }
         var p = parseInt(node.one('.percentblock input[type=number]').get('value'), 10);
-       if (isNaN(p) || p < 0 || p > 100) { errors.push('availability_classmetrics:error_percent'); }
+        if (isNaN(p) || p < 0 || p > 100) {
+            errors.push('availability_classmetrics:error_percent');
+        }
     } else {
         var m = parseInt(node.one('.minblock input[type=number]').get('value'), 10);
-       if (isNaN(m) || m < 0) { errors.push('availability_classmetrics:error_minstudents'); }
+        if (isNaN(m) || m < 0) {
+            errors.push('availability_classmetrics:error_minstudents');
+        }
     }
     // Sanitiza: remove undefined/strings vazias por segurança.
     for (var i = errors.length - 1; i >= 0; i--) {

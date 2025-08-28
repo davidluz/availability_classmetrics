@@ -28,8 +28,3 @@ $string['error_percent'] = 'Enter a percentage between 0 and 100.';
 $string['error_minstudents'] = 'Enter a minimum number of students (≥ 0).';
 
 $string['privacy:metadata'] = 'The availability_classmetrics plugin does not store any personal data.';
-
-$string['error_noactivities'] = 'Selecione ao menos 1 atividade com conclusão habilitada.';
-$string['error_percent'] = 'Informe um percentual entre 0 e 100.';
-$string['error_minstudents'] = 'Informe um número mínimo de alunos (≥ 0).';
-
