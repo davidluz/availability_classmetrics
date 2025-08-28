@@ -142,33 +142,35 @@ class condition extends core_condition {
      * Check if a student has completed the specified activities
      */
     private function student_completed_activities($userid, $courseid) {
-        global $DB;
-        
+        global $CFG;
+        require_once($CFG->libdir . '/completionlib.php');
+
         if (empty($this->activities)) {
-            return true; // No activities specified means condition is met
+            // No activities specified means condition is met.
+            return true;
         }
-        
-        $activities = explode(',', $this->activities);
-        
-        foreach ($activities as $cmid) {
-            $cmid = (int)trim($cmid);
-            if ($cmid <= 0) {
-                continue;
+
+        $course = get_course($courseid);
+        $completion = new \completion_info($course);
+
+        $activityids = array_filter(array_map('intval', explode(',', $this->activities)));
+
+        foreach ($activityids as $cmid) {
+            $cm = get_coursemodule_from_id(null, $cmid, $courseid, IGNORE_MISSING);
+            if (!$cm) {
+                // If the activity no longer exists treat as not completed.
+                return false;
             }
-            
-            // Check if the activity is completed for this user
-            $completion = $DB->get_record('course_modules_completion', [
-                'coursemoduleid' => $cmid,
-                'userid' => $userid,
-                'completionstate' => COMPLETION_COMPLETE
-            ]);
-            
-            if (!$completion) {
-                return false; // At least one activity is not completed
+
+            $data = $completion->get_data($cm, false, $userid);
+            if (!$data || $data->completionstate < COMPLETION_COMPLETE) {
+                // At least one activity is not completed.
+                return false;
             }
         }
-        
-        return true; // All activities are completed
+
+        // All activities are completed.
+        return true;
     }
 
     public function get_description($full, $not, info $info) {
