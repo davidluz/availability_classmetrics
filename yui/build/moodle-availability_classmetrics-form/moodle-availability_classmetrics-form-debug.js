@@ -16,7 +16,7 @@ YUI.add('moodle-availability_classmetrics-form', function(Y, NAME) {
         var strings = M.str['availability_classmetrics'] || {};
         json = json || {};
 
-        var rule = json.rule || 'percent';
+        var rule = json.rule || (this.cms.length ? 'percent' : 'minstudents');
         var groupid = json.groupid || 0;
         var aggregation = (json.aggregation === 'any') ? 'any' : 'all';
         var percent = (typeof json.percent !== 'undefined') ? json.percent : 0;
@@ -116,35 +116,41 @@ YUI.add('moodle-availability_classmetrics-form', function(Y, NAME) {
             var p = parseInt(node.one('.percentblock input[type=number]').get('value'), 10);
             value.percent = isNaN(p) ? 0 : Math.max(0, Math.min(100, p));
         } else {
+            delete value.activities;
+            delete value.aggregation;
+            delete value.percent;
             var m = parseInt(node.one('.minblock input[type=number]').get('value'), 10);
             value.minstudents = isNaN(m) ? 0 : Math.max(0, m);
         }
     };
 
     // Validação no cliente: empurrar **component:id** e nunca itens vazios.
-    M.availability_classmetrics.form.fillErrors = function(errors, node) {
-        var rule = node.one('input[name=rule]:checked').get('value');
+// Substitua a função inteira por esta versão ↓
+M.availability_classmetrics.form.fillErrors = function(errors, node) {
+    var rule = node.one('input[name=rule]:checked').get('value');
 
-        if (rule === 'percent') {
-            var selectedActs = 0;
-            node.all('.percentblock select option').each(function(opt){
-                if (opt.get('selected')) { selectedActs++; }
-            });
-            if (selectedActs === 0) { errors.push('availability_classmetrics:error_noactivities'); }
+    if (rule === 'percent') {
+        var selectedActs = 0;
+        node.all('.percentblock select option').each(function(opt){
+            if (opt.get('selected')) { selectedActs++; }
+        });
+        // Empurra só o identificador da string (sem "availability_classmetrics:")
+         if (selectedActs === 0) { errors.push('availability_classmetrics:error_noactivities'); }
 
-            var p = parseInt(node.one('.percentblock input[type=number]').get('value'), 10);
-            if (isNaN(p) || p < 0 || p > 100) { errors.push('availability_classmetrics:error_percent'); }
-        } else {
-            var m = parseInt(node.one('.minblock input[type=number]').get('value'), 10);
-            if (isNaN(m) || m < 0) { errors.push('availability_classmetrics:error_minstudents'); }
+        var p = parseInt(node.one('.percentblock input[type=number]').get('value'), 10);
+       if (isNaN(p) || p < 0 || p > 100) { errors.push('availability_classmetrics:error_percent'); }
+    } else {
+        var m = parseInt(node.one('.minblock input[type=number]').get('value'), 10);
+       if (isNaN(m) || m < 0) { errors.push('availability_classmetrics:error_minstudents'); }
+    }
+
+    // Sanitiza: remove undefined/strings vazias por segurança.
+    for (var i = errors.length - 1; i >= 0; i--) {
+        if (!errors[i] || typeof errors[i] !== 'string') {
+            errors.splice(i, 1);
         }
+    }
+};
 
-        // Sanitiza: remove undefined/strings vazias por segurança.
-        for (var i = errors.length - 1; i >= 0; i--) {
-            if (!errors[i] || typeof errors[i] !== 'string') {
-                errors.splice(i, 1);
-            }
-        }
-    };
 
 }, '1.0.0', { requires: ['base', 'node', 'event', 'moodle-core_availability-form'] });

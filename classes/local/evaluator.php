@@ -36,7 +36,9 @@ class evaluator {
         $params = [
             'courseid' => $courseid,
             'ctxid'    => $coursectx->id,
-            'now'      => $now,
+            'now1'     => $now,
+            'now2'     => $now,
+            
         ];
 
         $groupsql = '';
@@ -58,8 +60,8 @@ class evaluator {
               JOIN {user_enrolments} ue
                 ON ue.userid = u.id
                AND ue.status = 0
-               AND (ue.timeend = 0 OR ue.timeend > :now)
-               AND ue.timestart <= :now
+               AND (ue.timeend = 0 OR ue.timeend > :now1)
+               AND ue.timestart <= :now2
               JOIN {enrol} e
                 ON e.id = ue.enrolid
                AND e.courseid = :courseid
