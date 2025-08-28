@@ -1,29 +1,35 @@
 <?php
+// Strings for availability_classmetrics (Moodle 4.5).
 
-defined("MOODLE_INTERNAL") || die();
+$string['pluginname'] = 'Class metrics (availability)';
+$string['title'] = 'Class metrics';
+$string['description'] = 'Restrict access based on class metrics (completion percentage and class size).';
 
-$string["pluginname"] = "Class Metrics Availability";
-$string["title"] = "Class Metrics";
-$string["description"] = "Restrict access based on class completion percentage or minimum number of students.";
-$string["completion_percentage"] = "Completion Percentage";
-$string["minimum_students"] = "Minimum Students";
-$string["select_activities"] = "Select activities";
-$string["select_group"] = "Filter by group";
+$string['rule'] = 'Rule';
+$string['rule_percent'] = 'Completion % (class)';
+$string['rule_minstudents'] = 'Minimum students (class)';
 
+$string['activities'] = 'Target activities';
+$string['aggregation'] = 'Aggregation across activities';
+$string['aggregation_all'] = 'ALL';
+$string['aggregation_any'] = 'ANY';
+$string['percent'] = 'Minimum percentage (%)';
+$string['minstudents'] = 'Minimum number of students';
+$string['group'] = 'Filter by group (optional)';
+$string['nogroup'] = '— Whole course —';
 
+$string['description_percent'] = 'Available when at least {$a->percent}% of the class have completed {$a->agg} of the selected activities {$a->scope}.';
+$string['description_minstudents'] = 'Available when there are at least {$a->min} active students {$a->scope}.';
+$string['scope_group'] = '(group: {$a})';
+$string['scope_course'] = '(whole course)';
 
-$string["error_percentage"] = "Percentage must be between 0 and 100.";
-$string["error_minimum"] = "Minimum number of students must be at least 1.";
-$string["condition_completion"] = "Class completion: {$a}% of students must complete selected activities";
-$string["condition_students"] = "Minimum students: at least {$a} students must be enrolled";
-$string["no_group"] = "All students";
+$string['error_noactivities'] = 'Select at least one activity with completion enabled.';
+$string['error_percent'] = 'Enter a percentage between 0 and 100.';
+$string['error_minstudents'] = 'Enter a minimum number of students (≥ 0).';
 
+$string['privacy:metadata'] = 'The availability_classmetrics plugin does not store any personal data.';
 
-$string["task_recalculate"] = "Recalculate class metrics availability conditions";
-
-
-$string["error_activities"] = "Please select at least one activity.";
-$string["condition_type"] = "Condition type";
-$string["percentage_label"] = "Percentage (%)";
-$string["minimum_label"] = "Minimum number of students";
+$string['error_noactivities'] = 'Selecione ao menos 1 atividade com conclusão habilitada.';
+$string['error_percent'] = 'Informe um percentual entre 0 e 100.';
+$string['error_minstudents'] = 'Informe um número mínimo de alunos (≥ 0).';
 

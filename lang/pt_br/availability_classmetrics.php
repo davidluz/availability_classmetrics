@@ -1,29 +1,34 @@
 <?php
+// Strings para availability_classmetrics (Moodle 4.5).
 
-defined("MOODLE_INTERNAL") || die();
+$string['pluginname'] = 'Métricas da turma (disponibilidade)';
+$string['title'] = 'Métricas da turma';
+$string['description'] = 'Restrinja o acesso com base em métricas da turma (percentual de conclusão e tamanho da turma).';
 
-$string["pluginname"] = "Disponibilidade por Métricas da Turma";
-$string["title"] = "Métricas da Turma";
-$string["description"] = "Restringir acesso com base na porcentagem de conclusão da turma ou número mínimo de alunos.";
-$string["completion_percentage"] = "Porcentagem de Conclusão";
-$string["minimum_students"] = "Número Mínimo de Alunos";
-$string["select_activities"] = "Selecionar atividades";
-$string["select_group"] = "Filtrar por grupo";
+$string['rule'] = 'Regra';
+$string['rule_percent'] = '% de conclusão (turma)';
+$string['rule_minstudents'] = 'Nº mínimo de alunos (turma)';
 
+$string['activities'] = 'Atividades-alvo';
+$string['aggregation'] = 'Agregação entre atividades';
+$string['aggregation_all'] = 'TODAS';
+$string['aggregation_any'] = 'QUALQUER';
+$string['percent'] = 'Percentual mínimo (%)';
+$string['minstudents'] = 'Número mínimo de alunos';
+$string['group'] = 'Filtrar por grupo (opcional)';
+$string['nogroup'] = '— Curso inteiro —';
 
+$string['description_percent'] = 'Disponível quando pelo menos {$a->percent}% da turma concluir {$a->agg} as atividades selecionadas {$a->scope}.';
+$string['description_minstudents'] = 'Disponível quando houver pelo menos {$a->min} alunos ativos {$a->scope}.';
+$string['scope_group'] = '(grupo: {$a})';
+$string['scope_course'] = '(curso inteiro)';
 
-$string["error_percentage"] = "A porcentagem deve estar entre 0 e 100.";
-$string["error_minimum"] = "O número mínimo de alunos deve ser pelo menos 1.";
-$string["condition_completion"] = "Conclusão da turma: {$a}% dos alunos devem completar as atividades selecionadas";
-$string["condition_students"] = "Mínimo de alunos: pelo menos {$a} alunos devem estar matriculados";
-$string["no_group"] = "Todos os alunos";
+$string['error_noactivities'] = 'Selecione ao menos 1 atividade com conclusão habilitada.';
+$string['error_percent'] = 'Informe um percentual entre 0 e 100.';
+$string['error_minstudents'] = 'Informe um número mínimo de alunos (≥ 0).';
 
-
-$string["task_recalculate"] = "Recalcular condições de disponibilidade por métricas da turma";
-
-
-$string["error_activities"] = "Selecione pelo menos uma atividade.";
-$string["condition_type"] = "Tipo de condição";
-$string["percentage_label"] = "Porcentagem (%)";
-$string["minimum_label"] = "Número mínimo de alunos";
+$string['privacy:metadata'] = 'O plugin availability_classmetrics não armazena dados pessoais.';
+$string['error_noactivities'] = 'Selecione ao menos 1 atividade com conclusão habilitada.';
+$string['error_percent'] = 'Informe um percentual entre 0 e 100.';
+$string['error_minstudents'] = 'Informe um número mínimo de alunos (≥ 0).';
 
