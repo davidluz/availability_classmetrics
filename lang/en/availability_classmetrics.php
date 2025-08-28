@@ -26,4 +26,5 @@ $string["error_activities"] = "Please select at least one activity.";
 $string["condition_type"] = "Condition type";
 $string["percentage_label"] = "Percentage (%)";
 $string["minimum_label"] = "Minimum number of students";
+$string["no_activities"] = "No activities with completion enabled found.";
 

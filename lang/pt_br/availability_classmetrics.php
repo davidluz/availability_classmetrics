@@ -26,4 +26,5 @@ $string["error_activities"] = "Selecione pelo menos uma atividade.";
 $string["condition_type"] = "Tipo de condição";
 $string["percentage_label"] = "Porcentagem (%)";
 $string["minimum_label"] = "Número mínimo de alunos";
+$string["no_activities"] = "Nenhuma atividade com conclusão habilitada encontrada.";
 
