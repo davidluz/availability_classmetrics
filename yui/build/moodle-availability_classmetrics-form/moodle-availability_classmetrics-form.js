@@ -142,5 +142,6 @@ YUI.add('moodle-availability_classmetrics-form', function(Y, NAME) {
     }
 };
 
+M.core_availability.form.addPlugin(M.availability_classmetrics.form);
 
 }, '1.0.0', { requires: ['base', 'node', 'event', 'moodle-core_availability-form'] });
