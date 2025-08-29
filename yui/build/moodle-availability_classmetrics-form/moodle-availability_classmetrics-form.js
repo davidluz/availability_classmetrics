@@ -1,36 +1,22 @@
 YUI.add('moodle-availability_classmetrics-form', function(Y, NAME) {
 
     M.availability_classmetrics = M.availability_classmetrics || {};
-    // Herda a API base do editor de disponibilidade.
     M.availability_classmetrics.form = Y.Object(M.core_availability.plugin);
-    // Deixa explícito o tipo do plugin (ajuda o core a montar o JSON).
     M.availability_classmetrics.form.type = 'classmetrics';
 
-    // Recebe dados do PHP (lista de atividades e grupos).
+    // Recebe dados do PHP.
     M.availability_classmetrics.form.initInner = function(cms, groups) {
         this.cms = cms || [];
         this.groups = groups || [];
-
-        // Delegação de eventos (uma única vez), igual aos plugins core.
-        if (!M.availability_classmetrics.form.addedEvents) {
-            M.availability_classmetrics.form.addedEvents = true;
-            var root = Y.one('.availability-field');
-            if (root) {
-                root.delegate('change', function() {
-                    M.core_availability.form.update();
-                }, '.availability_classmetrics select, .availability_classmetrics input');
-            }
-        }
+        // (Não dependemos mais de delegate global aqui.)
     };
 
-    // Helpers ------------------------------
-
+    // Helpers ---------------------------------------------------------------
     function getCurrentRule(node) {
-        // Regra SEMPRE lida do rádio dentro do node (determinístico).
-        var rb = node.one('input[name=rule]:checked');
+        var ruleName = node.getAttribute('data-rule-name');
+        var rb = ruleName ? node.one('input[name="' + ruleName + '"]:checked') : null;
         return (rb && rb.get('value') === 'minstudents') ? 'minstudents' : 'percent';
     }
-
     function syncBlocksVisibility(node, rule) {
         var percentWrap = node.one('.percentblock');
         var minWrap = node.one('.minblock');
@@ -38,7 +24,7 @@ YUI.add('moodle-availability_classmetrics-form', function(Y, NAME) {
         if (minWrap) { minWrap.setStyle('display', rule === 'minstudents' ? '' : 'none'); }
     }
 
-    // Constrói os campos do editor.
+    // Monta a UI.
     M.availability_classmetrics.form.getNode = function(json) {
         json = json || {};
         var strings = M.str['availability_classmetrics'] || {};
@@ -50,14 +36,19 @@ YUI.add('moodle-availability_classmetrics-form', function(Y, NAME) {
         var minstudents = (typeof json.minstudents !== 'undefined') ? json.minstudents : 0;
         var activities = json.activities || [];
 
-        // Root do plugin (o core o envolve com um wrapper .availability_classmetrics).
         var root = Y.Node.create('<div class="availability_classmetrics"></div>');
+
+        // Nomes ÚNICOS por instância para evitar colisões.
+        var ruleName = 'acm_rule_' + Y.guid();
+        var aggName  = 'acm_agg_' + Y.guid();
+        root.setAttribute('data-rule-name', ruleName);
+        root.setAttribute('data-agg-name', aggName);
 
         // --- Regra
         var ruleWrap = Y.Node.create('<div class="form-group"></div>');
         ruleWrap.append('<label>' + (strings.rule || 'Regra') + '</label><br>');
-        var rbPercent = Y.Node.create('<label><input type="radio" name="rule" value="percent"> ' + (strings.rule_percent || '% de conclusão (turma)') + '</label> ');
-        var rbMin     = Y.Node.create('<label><input type="radio" name="rule" value="minstudents"> ' + (strings.rule_minstudents || 'Nº mínimo de alunos (turma)') + '</label>');
+        var rbPercent = Y.Node.create('<label><input type="radio" name="' + ruleName + '" value="percent"> ' + (strings.rule_percent || '% de conclusão (turma)') + '</label> ');
+        var rbMin     = Y.Node.create('<label><input type="radio" name="' + ruleName + '" value="minstudents"> ' + (strings.rule_minstudents || 'Nº mínimo de alunos (turma)') + '</label>');
         rbPercent.one('input').set('checked', rule === 'percent');
         rbMin.one('input').set('checked', rule === 'minstudents');
         ruleWrap.append(rbPercent);
@@ -66,7 +57,7 @@ YUI.add('moodle-availability_classmetrics-form', function(Y, NAME) {
 
         // --- Grupo
         var groupWrap = Y.Node.create('<div class="form-group groupblock"></div>');
-        groupWrap.append('<label>' + (strings.group || 'Grupo') + '</label><br>');
+        groupWrap.append('<label>' + (strings.group || 'Filtrar por grupo (opcional)') + '</label><br>');
         var gsel = Y.Node.create('<select class="custom-select" name="groupid"></select>');
         Y.Array.each(this.groups, function(g) {
             var opt = Y.Node.create('<option></option>');
@@ -93,8 +84,8 @@ YUI.add('moodle-availability_classmetrics-form', function(Y, NAME) {
 
         var aggWrap = Y.Node.create('<div class="mt-2"></div>');
         aggWrap.append('<label>' + (strings.aggregation || 'Agregação entre atividades') + '</label><br>');
-        var rbAll = Y.Node.create('<label><input type="radio" name="aggr" value="all"> ' + (strings.aggregation_all || 'TODAS') + '</label> ');
-        var rbAny = Y.Node.create('<label><input type="radio" name="aggr" value="any"> ' + (strings.aggregation_any || 'QUALQUER') + '</label>');
+        var rbAll = Y.Node.create('<label><input type="radio" name="' + aggName + '" value="all"> ' + (strings.aggregation_all || 'TODAS') + '</label> ');
+        var rbAny = Y.Node.create('<label><input type="radio" name="' + aggName + '" value="any"> ' + (strings.aggregation_any || 'QUALQUER') + '</label>');
         rbAll.one('input').set('checked', aggregation === 'all');
         rbAny.one('input').set('checked', aggregation === 'any');
         aggWrap.append(rbAll);
@@ -117,19 +108,33 @@ YUI.add('moodle-availability_classmetrics-form', function(Y, NAME) {
         minWrap.append(minin);
         root.append(minWrap);
 
-        // Sincroniza visibilidade de blocos conforme valor atual do rádio.
+        // Visibilidade inicial baseada no rádio.
         syncBlocksVisibility(root, getCurrentRule(root));
 
-        // Alternância (apenas UI; leitura real da regra é sempre pelo rádio).
+        // Alternância (UI).
         rbPercent.one('input').on('change', function() { syncBlocksVisibility(root, 'percent'); });
         rbMin.one('input').on('change', function() { syncBlocksVisibility(root, 'minstudents'); });
+
+        // === Delegação local de eventos (independente do olho/tema/etc) ===
+        // Qualquer mudança dentro do nosso container dispara update do core.
+        root.delegate('change', function() {
+            if (M && M.core_availability && M.core_availability.form && typeof M.core_availability.form.update === 'function') {
+                M.core_availability.form.update();
+            }
+        }, 'select, input');
+
+        // Dispara um update inicial (garante que o JSON reflita o estado visível agora).
+        Y.later(0, null, function() {
+            if (M && M.core_availability && M.core_availability.form && typeof M.core_availability.form.update === 'function') {
+                M.core_availability.form.update();
+            }
+        });
 
         return root;
     };
 
-    // Serializa os valores para o JSON que o Moodle salva.
+    // Serializa para JSON.
     M.availability_classmetrics.form.fillValue = function(value, node) {
-        // Define explicitamente o tipo do plugin (garante JSON correto no POST).
         value.type = 'classmetrics';
 
         var rule = getCurrentRule(node);
@@ -139,7 +144,6 @@ YUI.add('moodle-availability_classmetrics-form', function(Y, NAME) {
         value.groupid = parseInt(gsel ? gsel.get('value') : 0, 10) || 0;
 
         if (rule === 'percent') {
-            // Atividades selecionadas — PROPRIEDADE DOM 'selected'
             var acts = [];
             node.all('.percentblock select[name=activities] option').each(function(opt){
                 if (opt.getDOMNode().selected) {
@@ -148,30 +152,27 @@ YUI.add('moodle-availability_classmetrics-form', function(Y, NAME) {
             });
             value.activities = acts;
 
-            // Agregação.
-            var aggInput = node.one('input[name=aggr]:checked');
+            var aggName = node.getAttribute('data-agg-name');
+            var aggInput = aggName ? node.one('input[name="' + aggName + '"]:checked') : null;
             value.aggregation = (aggInput && aggInput.get('value') === 'any') ? 'any' : 'all';
 
-            // Percentual.
             var pNode = node.one('.percentblock input[name=percent]');
             var p = parseInt(pNode ? pNode.get('value') : 0, 10);
             value.percent = isNaN(p) ? 0 : Math.max(0, Math.min(100, p));
 
-            // Limpa chaves da outra regra.
             delete value.minstudents;
         } else {
             var mNode = node.one('.minblock input[name=minstudents]');
             var m = parseInt(mNode ? mNode.get('value') : 0, 10);
             value.minstudents = isNaN(m) ? 0 : Math.max(0, m);
 
-            // Limpa chaves da outra regra.
             delete value.activities;
             delete value.aggregation;
             delete value.percent;
         }
     };
 
-    // Validação client-side: valida em cima do objeto montado por fillValue (padrão core).
+    // Validação baseada em fillValue (padrão core).
     M.availability_classmetrics.form.fillErrors = function(errors, node) {
         var v = {};
         this.fillValue(v, node);
@@ -191,7 +192,6 @@ YUI.add('moodle-availability_classmetrics-form', function(Y, NAME) {
             }
         }
 
-        // Sanitiza.
         for (var i = errors.length - 1; i >= 0; i--) {
             if (!errors[i] || typeof errors[i] !== 'string') {
                 errors.splice(i, 1);
@@ -199,7 +199,7 @@ YUI.add('moodle-availability_classmetrics-form', function(Y, NAME) {
         }
     };
 
-    // Registro do plugin somente quando o core_availability estiver pronto (hotfix).
+    // Registro do plugin quando o core estiver pronto (hotfix).
     (function registerWhenReady(tries){
         try {
             if (M && M.core_availability && M.core_availability.form) {
@@ -212,7 +212,7 @@ YUI.add('moodle-availability_classmetrics-form', function(Y, NAME) {
                     return;
                 }
             }
-        } catch(e) { /* tenta de novo */ }
+        } catch(e) {}
         if (tries > 0) {
             Y.later(50, null, registerWhenReady, [tries - 1]);
         } else {
@@ -220,4 +220,4 @@ YUI.add('moodle-availability_classmetrics-form', function(Y, NAME) {
         }
     })(50);
 
-}, '1.0.5', { requires: ['base', 'node', 'event', 'moodle-core_availability-form'] });
+}, '1.0.7', { requires: ['base', 'node', 'event', 'moodle-core_availability-form'] });
